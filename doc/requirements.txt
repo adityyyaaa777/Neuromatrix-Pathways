@@ -1,0 +1,29 @@
+# NeuroMatrix Pathways - Python dependencies
+#
+# Setup steps (run these commands from the repository root after cloning):
+#
+#   git clone <repository-url>
+#   cd Neuromatrix-Pathways
+#   py -m venv .venv
+#   .venv\Scripts\activate
+#   py -m pip install --upgrade pip
+#   py -m pip install -r requirements.txt
+#
+# Start the backend in a second terminal:
+#
+#   cd backend
+#   py manage.py migrate
+#   py manage.py runserver
+#
+# Install and start the frontend in another terminal:
+#
+#   cd frontend
+#   npm install
+#   npm run dev
+#
+# The frontend development server runs at http://localhost:5173.
+
+Django>=6.1,<7.0
+djangorestframework>=3.16,<4.0
+django-cors-headers>=4.7,<5.0
+djangorestframework-simplejwt>=5.5,<6.0
