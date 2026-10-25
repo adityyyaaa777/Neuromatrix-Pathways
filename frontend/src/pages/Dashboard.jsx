@@ -589,90 +589,73 @@ function Dashboard() {
         </section>
 
 
+        
         {/* ===================================================
             BOTTOM CARDS
         =================================================== */}
 
         <section className="dashboard-bottom-grid">
 
+          {/* My Profile */}
 
           <Link
             to="/profile"
             className="dashboard-small-card"
           >
-
             <div className="small-card-icon">
               ◉
             </div>
 
-
             <div>
-
-              <h3>
-                My Profile
-              </h3>
-
+              <h3>My Profile</h3>
 
               <p>
                 View and manage your
                 personal information.
               </p>
-
             </div>
-
 
             <span className="small-card-arrow">
               →
             </span>
-
           </Link>
 
+          {/* My Report */}
 
-          <div
-            className={
-              "dashboard-small-card " +
-              "disabled-card"
-            }
+          <Link
+            to="/report"
+            className="dashboard-small-card nm-report-dashboard-card"
+            aria-label="View your assessment report"
           >
-
             <div className="small-card-icon">
-              ◌
+              ◈
             </div>
-
 
             <div>
-
-              <h3>
-                My Report
-              </h3>
-
+              <h3>My Report</h3>
 
               <p>
-                Your personalized report
-                will appear here after
-                completing your assessment.
+                View your completed assessment,
+                dimension scores, and recorded responses.
               </p>
 
+              <strong className="nm-dashboard-report-link">
+                View Report →
+              </strong>
             </div>
 
-
             <span className="small-card-arrow">
-              —
+              →
             </span>
-
-          </div>
-
+          </Link>
 
         </section>
-
 
       </main>
 
     </div>
-
   );
 
 }
-
 
 export default Dashboard;
