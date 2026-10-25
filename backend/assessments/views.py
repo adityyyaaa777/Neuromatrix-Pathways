@@ -15,6 +15,7 @@ from .services.scoring import calculate_assessment_result
 from .models import (
     Assessment,
     AssessmentAttempt,
+    AssessmentResult,
     Response as AssessmentResponse,
     Option,
     Question,
@@ -588,3 +589,104 @@ def complete_attempt(request, attempt_id):
         },
         status=status.HTTP_200_OK,
     )
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_report(request):
+    result_id = request.query_params.get("result_id")
+
+    results = (
+        AssessmentResult.objects
+        .filter(
+            attempt__user=request.user,
+            attempt__is_completed=True,
+        )
+        .select_related("attempt__assessment")
+    )
+
+    if result_id:
+        if not result_id.isdigit():
+            return Response(
+                {"detail": "Invalid result ID."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        result = get_object_or_404(
+            results,
+            pk=int(result_id),
+        )
+    else:
+        result = results.order_by("-created_at").first()
+
+    if result is None:
+        return Response(
+            {"detail": "No completed report was found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    attempt = result.attempt
+
+    responses = (
+        attempt.responses
+        .select_related(
+            "question",
+            "question__section",
+            "selected_option",
+        )
+        .prefetch_related(
+            "question__dimension_mappings__dimension"
+        )
+        .order_by(
+            "question__section__order",
+            "question__order",
+        )
+    )
+
+    questions = []
+
+    for number, response in enumerate(responses, start=1):
+        question = response.question
+        option = response.selected_option
+
+        questions.append({
+            "number": number,
+            "section": question.section.name,
+            "question": question.text,
+            "answer": option.text,
+            "answer_value": option.value,
+            "dimensions": [
+                mapping.dimension.name
+                for mapping in question.dimension_mappings.all()
+            ],
+        })
+
+    dimension_results = (
+        result.dimension_results
+        .select_related("dimension")
+        .all()
+    )
+
+    return Response({
+        "id": result.id,
+        "created_at": result.created_at,
+        "scoring_version": result.scoring_version,
+        "assessment": {
+            "name": attempt.assessment.name,
+            "slug": attempt.assessment.slug,
+        },
+        "question_count": Question.objects.filter(
+            section__assessment=attempt.assessment,
+            is_active=True,
+        ).count(),
+        "answered_count": len(questions),
+        "questions": questions,
+        "dimensions": [
+            {
+                "name": item.dimension.name,
+                "code": item.dimension.code,
+                "raw_score": item.raw_score,
+                "normalized_score": item.normalized_score,
+            }
+            for item in dimension_results
+        ],
+    })

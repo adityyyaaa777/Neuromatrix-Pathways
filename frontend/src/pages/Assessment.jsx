@@ -439,59 +439,47 @@ function Assessment() {
   };
 
 
+  
   // =========================================================
   // SUBMIT
   // =========================================================
 
   const submitAssessment = async () => {
-
     if (
-      Object.keys(answers).length !==
-      questions.length
+      Object.keys(answers).length !== questions.length
     ) {
       return;
     }
 
     try {
-
       setSubmitting(true);
       setError(null);
 
-      await completeAttempt(
-        attemptId
-      );
-
+      // Complete assessment and retrieve generated result ID
+      const completion = await completeAttempt(attemptId);
 
       // Clear local assessment state
+      localStorage.removeItem(ANSWERS_STORAGE_KEY);
+      localStorage.removeItem(ATTEMPT_STORAGE_KEY);
+      localStorage.removeItem(ASSIGNED_ASSESSMENT_STORAGE_KEY);
 
-      localStorage.removeItem(
-        ANSWERS_STORAGE_KEY
-      );
-
-      localStorage.removeItem(
-        ATTEMPT_STORAGE_KEY
-      );
-
-      localStorage.removeItem(
-        ASSIGNED_ASSESSMENT_STORAGE_KEY
-      );
-
-
-      navigate(
-        "/assessment/completed"
-      );
-
+      // Navigate directly to the report
+      if (completion?.result_id) {
+        navigate(
+          `/report?result_id=${encodeURIComponent(
+            completion.result_id
+          )}`
+        );
+      } else {
+        navigate("/report");
+      }
     } catch (err) {
-
-      console.error(
-        "Failed to complete assessment:",
-        err
-      );
+      console.error("Failed to complete assessment:", err);
 
       setError(
         err.response?.data?.detail ||
-        err.response?.data?.error ||
-        "Unable to submit the assessment. Please try again."
+          err.response?.data?.error ||
+          "Unable to submit the assessment. Please try again."
       );
 
       setSubmitting(false);

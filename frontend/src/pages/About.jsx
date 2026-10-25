@@ -231,7 +231,7 @@ function About() {
             <article className="nm-card">
 
               <div className="nm-card-icon">
-                ðŸ§
+                ï¿½
               </div>
 
               <span className="nm-principle-label">

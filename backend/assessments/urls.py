@@ -1,8 +1,10 @@
+
 from django.urls import path
 
 from .views import (
     health_check,
     assessment_detail,
+    my_report,
     start_attempt,
     save_response,
     complete_attempt,
@@ -22,16 +24,31 @@ from .admin_views import (
 
 
 urlpatterns = [
+    # -------------------------
+    # Health Check
+    # -------------------------
+
     path(
         "health/",
         health_check,
         name="health-check",
     ),
 
+    # -------------------------
+    # Student Assessment
+    # -------------------------
+
     path(
         "my-assessment/",
         my_assessment,
         name="my-assessment",
+    ),
+
+    # IMPORTANT: Keep the report route before <slug:slug>/
+    path(
+        "my-report/",
+        my_report,
+        name="my-report",
     ),
 
     # -------------------------
@@ -87,7 +104,7 @@ urlpatterns = [
     ),
 
     # -------------------------
-    # Student APIs
+    # Assessment Attempt APIs
     # -------------------------
 
     path(
@@ -108,6 +125,7 @@ urlpatterns = [
         name="start-attempt",
     ),
 
+    # IMPORTANT: Generic assessment route must stay LAST
     path(
         "<slug:slug>/",
         assessment_detail,
